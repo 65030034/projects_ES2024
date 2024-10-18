@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Meter Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; }
+        .container { max-width: 600px; margin: 0 auto; text-align: center; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+        h1 { color: #333; }
+        .data { font-size: 24px; margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Power Meter Dashboard</h1>
+        <div id="sensorData" class="data">Loading data...</div>
+        <div id="error" class="error"></div>
+    </div>
+
+    <script>
+        async function fetchSensorData() {
+            try {
+                const response = await fetch('/sensor-data');
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+
+                if (Object.keys(data).length === 0) {
+                    document.getElementById('sensorData').innerHTML = 'No data available.';
+                } else {
+                    document.getElementById('sensorData').innerHTML = `
+                        <strong>Power:</strong> ${data.power} W<br>
+                        <strong>Voltage:</strong> ${data.voltage} V<br>
+                        <strong>Current:</strong> ${data.current} A<br>
+                        <strong>Timestamp:</strong> ${new Date(data.timestamp).toLocaleString()}
+                    `;
+                }
+                document.getElementById('error').innerText = '';
+            } catch (error) {
+                console.error('Error fetching sensor data:', error);
+                document.getElementById('sensorData').innerHTML = 'Failed to load data.';
+                document.getElementById('error').innerText = 'Error fetching data.';
+            }
+        }
+
+        setInterval(fetchSensorData, 1000);
+    </script>
+</body>
+</html>
+
